@@ -85,5 +85,6 @@ def main():
 def test():
 	pick_c(None)
 
+#test()
 if __name__ == "__main__":
 	main()

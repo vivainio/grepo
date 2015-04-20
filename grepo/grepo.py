@@ -23,8 +23,8 @@ def runpeco(input):
 
 def grep_c(args):
 	os.chdir(root)
-	out = os.popen('git grep ' + args.pattern).read()
-	print out
+	out = os.popen('git grep -n ' + args.pattern).read()
+	#print out
 	db['grepoutput'] = out
 
 	p = Popen('peco', stdin = PIPE, stdout = PIPE)
@@ -37,9 +37,9 @@ def pick_c(args):
 	os.chdir(root)
 	lines = runpeco(db['grepoutput']).splitlines()
 	for l in lines:
-		fname, text = l.split(':', 1)
-		print fname
-		os.system('subl ' + fname)
+		fname, line, text = l.split(':', 2)
+		print "pick:", fname
+		call(['subl',fname + ':' + line])
 			
 
 def main():

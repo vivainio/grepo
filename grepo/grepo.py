@@ -42,10 +42,14 @@ def pick_c(args):
 		os.system('subl ' + fname)
 			
 
-args.init()
+def main():
+	args.init()
 
-args.sub('here', here_c, help = 'Set current dir as prjroot')
-s = args.sub('g', grep_c, help = 'Grep the project')
-s.arg("pattern", type=str)
-args.sub('p', pick_c, help = 'Use peco to quick pick one of the earlier choices')
-args.parse()
+	args.sub('here', here_c, help = 'Set current dir as prjroot')
+	s = args.sub('g', grep_c, help = 'Grep the project')
+	s.arg("pattern", type=str)
+	args.sub('p', pick_c, help = 'Use peco to quick pick one of the earlier choices')
+	args.parse()
+
+if __name__ == "__main__":
+	main()

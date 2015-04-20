@@ -56,7 +56,7 @@ def peco_and_edit(input):
 		fname, line, text = l.split(':', 2)
 		print "pick:", fname
 		call(['subl',fname + ':' + line])
-		more_info(fname)
+		#more_info(fname)
 
 
 def grep_c(args):

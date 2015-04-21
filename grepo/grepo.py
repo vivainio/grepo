@@ -15,7 +15,7 @@ def runpeco(input):
 	tf = tempfile.NamedTemporaryFile(delete=False)
 	tf.write(input)
 	tf.close()
-	p = Popen(['peco', '-b', '5000000', tf.name], stdout = PIPE)
+	p = Popen(['peco', tf.name], stdout = PIPE)
 	out = p.stdout.read()
 	os.unlink(tf.name)
 	#fin, fout = p.stdin, p.stdout
@@ -33,22 +33,36 @@ def parents(pth):
 		cur = c2
 		yield cur
 
-def search_str(s, files):
-	res = []
-	for f in files:
-		if s in open(f).read():
-			res.append(f)
+def search_str(pats, files):
+	#print pats,'in', files
+	res = set()
 
+	for f in files:
+		for s in pats:
+			if s.lower() in open(f).read().lower():
+				res.add(f)
+	#print "found",res
 	return res
 
 def more_info(fname):
 	fname = os.path.abspath(fname)
 	print fname
 	bname = os.path.basename(fname)
+	
+	pats = [bname]
+
+	refs = set()
+
 	for p in parents(fname):
 		look = glob.glob(p + '/*.csproj') + glob.glob(p + '/*.sln')
-		found = search_str(bname, look)
-		print p, look, found
+		found = search_str(pats, look)
+		if found:
+			pats.extend(os.path.basename(f) for f in found)
+			refs.update(found)
+		#print p, look, found
+	
+	for r in refs:
+		print r
 
 def peco_and_edit(input):
 	lines = runpeco(input).splitlines()
@@ -56,7 +70,7 @@ def peco_and_edit(input):
 		fname, line, text = l.split(':', 2)
 		print "pick:", fname
 		call(['subl',fname + ':' + line])
-		#more_info(fname)
+		more_info(fname)
 
 
 def grep_c(args):

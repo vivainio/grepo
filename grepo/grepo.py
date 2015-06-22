@@ -85,7 +85,16 @@ def grep_c(args):
 def pick_c(args):
 	os.chdir(root)
 	peco_and_edit(db['grepoutput'])
-			
+
+def checkout_c(args):
+	out = os.popen('git branch -a ').read()
+	lines = runpeco(out).splitlines()
+	branch = lines[0].strip()
+	print branch
+	assert len(branch.split()) == 1
+	os.system("git checkout %s" % branch)
+
+
 
 def main():
 	args.init()
@@ -94,7 +103,9 @@ def main():
 	s = args.sub('g', grep_c, help = 'Grep the project')
 	s.arg("pattern", type=str)
 	args.sub('p', pick_c, help = 'Use peco to quick pick one of the earlier choices')
+	args.sub('co', checkout_c, help = "select and check out a branch")
 	args.parse()
+
 
 def test():
 	pick_c(None)

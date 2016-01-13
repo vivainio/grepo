@@ -1,4 +1,9 @@
 # grepo
+
+![screenshot](https://cloud.githubusercontent.com/assets/557579/12301809/ac1faf54-ba2a-11e5-8efa-4d851df34f76.png
+)
+
+
 Git grep + peco
 
 Shorthand to make "git grep" and "git checkout" more interactive, with aid of Peco.

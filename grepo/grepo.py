@@ -21,7 +21,7 @@ def runpeco(input):
 	#fin, fout = p.stdin, p.stdout
 	#fin.write(input)
 	#fin.close()
-	
+
 	return out
 
 def parents(pth):
@@ -48,7 +48,7 @@ def more_info(fname):
 	fname = os.path.abspath(fname)
 	print fname
 	bname = os.path.basename(fname)
-	
+
 	pats = [bname]
 
 	refs = set()
@@ -60,7 +60,7 @@ def more_info(fname):
 			pats.extend(os.path.basename(f) for f in found)
 			refs.update(found)
 		#print p, look, found
-	
+
 	for r in refs:
 		print r
 
@@ -87,12 +87,13 @@ def pick_c(args):
 	peco_and_edit(db['grepoutput'])
 
 def checkout_c(args):
-	out = os.popen('git branch -a ').read()
-	lines = runpeco(out).splitlines()
-	branch = lines[0].strip()
-	print branch
-	assert len(branch.split()) == 1
-	os.system("git checkout %s" % branch)
+    out = os.popen('git branch -a ').read()
+    lines = runpeco(out).splitlines()
+    branch = lines[0].strip()
+    print branch
+    assert len(branch.split()) == 1
+    branch = re.replace('remotes/origin', '')
+    os.system("git checkout %s" % branch)
 
 
 

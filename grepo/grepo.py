@@ -4,6 +4,7 @@ import os, glob
 from subprocess import *
 import tempfile
 
+
 db = pickleshare.PickleShareDB("~/.grepo")
 
 root = db.get('root', None)
@@ -86,26 +87,34 @@ def pick_c(args):
 	os.chdir(root)
 	peco_and_edit(db['grepoutput'])
 
-def checkout_c(args):
-    out = os.popen('git branch -a ').read()
+
+
+def checkout_by_git_cmd(cmd):
+
+    out = os.popen(cmd).read()
     lines = runpeco(out).splitlines()
     branch = lines[0].strip()
     print branch
     assert len(branch.split()) == 1
-    branch = re.replace('remotes/origin', '')
+    branch = branch.replace('remotes/origin', '')
     os.system("git checkout %s" % branch)
 
+def checkout_c(args):
+    checkout_by_git_cmd("git branch -a")
 
+def recent_c(argn):
+    checkout_by_git_cmd("""git for-each-ref --count=30 --sort=-committerdate refs/heads/ --format="%(refname:short)" """)
 
 def main():
-	args.init()
+    args.init()
 
-	args.sub('here', here_c, help = 'Set current dir as prjroot')
-	s = args.sub('g', grep_c, help = 'Grep the project')
-	s.arg("pattern", type=str)
-	args.sub('p', pick_c, help = 'Use peco to quick pick one of the earlier choices')
-	args.sub('co', checkout_c, help = "select and check out a branch")
-	args.parse()
+    args.sub('here', here_c, help = 'Set current dir as prjroot')
+    s = args.sub('g', grep_c, help = 'Grep the project')
+    s.arg("pattern", type=str)
+    args.sub('p', pick_c, help = 'Use peco to quick pick one of the earlier choices')
+    args.sub('co', checkout_c, help = "select and check out a branch")
+    args.sub('r', recent_c, help="select and check out a recently used branch")
+    args.parse()
 
 
 def test():

@@ -3,7 +3,8 @@ import args
 import os, glob
 from subprocess import *
 import tempfile, re
-
+import argparse
+import pprint
 
 db = pickleshare.PickleShareDB("~/.grepo")
 
@@ -62,13 +63,20 @@ def more_info(fname):
     for r in refs:
         print r
 
+def edit(fname, line):
+    call(['code', '-g', fname + ':' + line], shell=True)
+
+
+def parse_grep_line(s):
+    return s.split(':', 2)
+
 def peco_and_edit(input):
     top = db['top']
     lines = runpeco(input).splitlines()
     for l in lines:
-        fname, line, text = l.split(':', 2)
+        fname, line, text = parse_grep_line(l)
         print "pick:", fname
-        call(['code', '-g', fname + ':' + line], shell=True)
+        edit(fname,line)
         more_info(fname)
 
 
@@ -83,7 +91,19 @@ def grep_c(args):
 
 def pick_c(args):
     os.chdir(db['top'])
-    peco_and_edit(db['grepoutput'])
+    out = db['grepoutput']
+    if args.choice is not None:
+        lines = out.splitlines()
+        if len(lines) <= args.choice:
+            print "Out of range, choose:"
+            pprint.pprint(list(enumerate(lines)))
+            return
+        fname, line, text = parse_grep_line(lines[args.choice])
+
+        edit(fname, line)
+        more_info(fname)
+    else:
+        peco_and_edit(db['grepoutput'])
 
 def checkout_by_git_cmd(cmd):
 
@@ -106,8 +126,17 @@ def save_top():
 
 
 def scan_c(args):
-    pat = args.pattern
-    out = os.popen('git grep --break --color --heading -p -n --full-name -C 2 ' + pat).read()
+
+    if args.e:
+        e = [('(' if a == '[' else ')' if a == ']' else a) for a in args.e]
+
+        pat = '-e ' + ' '.join(e)
+    else:
+        pat = ' '.join(args.pattern)
+
+    cmd = 'git grep --break --color --heading -p -n --full-name -C 2 ' + pat
+    print cmd
+    out = os.popen(cmd).read()
 
     ndx = 0
 
@@ -118,9 +147,9 @@ def scan_c(args):
             print "No match"
             return
         fname, cont = chunk.split("\n", 1)
-        ndx+=1
         for_pick.append('%s:0: hit #%s' % (fname, ndx))
         print '\n\n  ************ %s (%d) ************\n' % (fname, ndx)
+        ndx+=1
         print cont
     db['grepoutput'] = '\n'.join(for_pick)
     save_top()
@@ -132,10 +161,12 @@ def main():
     args.sub('here', here_c, help = 'Set current dir as prjroot')
     s = args.sub('g', grep_c, help = 'Grep the project')
     s.arg("pattern", type=str)
-    sc = args.sub('sc', scan_c, help ='Search with context')
-    sc.arg("pattern", type=str)
+    sc = args.sub('s', scan_c, help ='Search with context')
+    sc.arg('-e', nargs=argparse.REMAINDER)
+    sc.arg("pattern", type=str, nargs=argparse.REMAINDER)
 
-    args.sub('p', pick_c, help = 'Use peco to quick pick one of the earlier choices')
+    pick = args.sub('p', pick_c, help = 'Use peco to quick pick one of the earlier choices')
+    pick.arg('choice', type=int, help='Choice number to pick immediately', nargs='?')
     args.sub('co', checkout_c, help = "select and check out a branch")
     args.sub('r', recent_c, help="select and check out a recently used branch")
 

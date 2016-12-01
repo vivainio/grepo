@@ -126,7 +126,6 @@ def save_top():
 
 
 def scan_c(args):
-
     if args.e:
         e = [('(' if a == '[' else ')' if a == ']' else a) for a in args.e]
 
@@ -134,8 +133,9 @@ def scan_c(args):
     else:
         pat = ' '.join(args.pattern)
 
+    maxlines = 999999999 if args.all else 50
+
     cmd = 'git grep --break --color --heading -p -n --full-name -C 2 ' + pat
-    print cmd
     out = os.popen(cmd).read()
 
     ndx = 0
@@ -150,7 +150,8 @@ def scan_c(args):
         for_pick.append('%s:0: hit #%s' % (fname, ndx))
         print '\n\n  ************ %s (%d) ************\n' % (fname, ndx)
         ndx+=1
-        print cont
+        linestruncated = "\n".join([(l[:200]+'...' if len(l) > 195 else l) for l in cont.split("\n")][:maxlines])
+        print linestruncated
     db['grepoutput'] = '\n'.join(for_pick)
     save_top()
 
@@ -162,6 +163,7 @@ def main():
     s = args.sub('g', grep_c, help = 'Grep the project')
     s.arg("pattern", type=str)
     sc = args.sub('s', scan_c, help ='Search with context')
+    sc.arg('--all', help="Do not limit hits per file", action='store_true')
     sc.arg('-e', nargs=argparse.REMAINDER)
     sc.arg("pattern", type=str, nargs=argparse.REMAINDER)
 

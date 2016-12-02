@@ -1,8 +1,8 @@
 from setuptools import setup
 
 setup(name='grepo',
-      version='1.1.0',
-      description='Grepo grep and peco tool',
+      version='1.2.0',
+      description='Grepo: grep and peco tool',
       author='Ville Vainio',
       author_email='vivainio@gmail.com',
       url='https://github.com/vivainio/grepo',

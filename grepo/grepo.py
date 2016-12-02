@@ -135,7 +135,7 @@ def scan_c(args):
 
     maxlines = 999999999 if args.all else 50
 
-    cmd = 'git grep --break --color --heading -p -n --full-name -C 2 ' + pat
+    cmd = 'git grep --break -i --color --heading -p -n --full-name -C 2 ' + pat
     out = os.popen(cmd).read()
 
     ndx = 0

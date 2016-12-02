@@ -18,10 +18,11 @@ usage: grepo [-h] {here,g,p,co,r} ...
 positional arguments:
   {here,g,p,co,r}
     here           Set current dir as prjroot
-    g              Grep the project
+    g              Grep the project (worse, use 's') instead for nicer output
     p              Use peco to quick pick one of the earlier choices
     co             select and check out a branch
     r              select and check out a recently used branch
+    s              better "search through the project". Highlight, fn context etc
 
 optional arguments:
   -h, --help       show this help message and exit

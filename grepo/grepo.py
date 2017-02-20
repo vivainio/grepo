@@ -146,7 +146,11 @@ def scan_c(args):
         if chunk == '':
             print "No match"
             return
-        fname, cont = chunk.split("\n", 1)
+        parts = chunk.split('\n', 1)
+        if len(parts) == 1:
+            # e.g. binary files
+            continue
+        fname, cont = parts
         for_pick.append('%s:0: hit #%s' % (fname, ndx))
         print '\n\n  ************ %s (%d) ************\n' % (fname, ndx)
         ndx+=1

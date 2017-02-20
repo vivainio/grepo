@@ -149,6 +149,8 @@ def scan_c(args):
         parts = chunk.split('\n', 1)
         if len(parts) == 1:
             # e.g. binary files
+
+            print " ***", parts[0]
             continue
         fname, cont = parts
         for_pick.append('%s:0: hit #%s' % (fname, ndx))

@@ -82,7 +82,7 @@ def peco_and_edit(input):
 
 def grep_c(args):
     os.chdir(root)
-    out = os.popen('git grep -n ' + args.pattern).read()
+    out = ppopen('git grep -n ' + args.pattern).read()
     #print out
     db['grepoutput'] = out
     save_top()
@@ -106,8 +106,7 @@ def pick_c(args):
         peco_and_edit(db['grepoutput'])
 
 def checkout_by_git_cmd(cmd):
-
-    out = os.popen(cmd).read()
+    out = ppopen(cmd).read()
     lines = runpeco(out).splitlines()
     branch = lines[0].strip()
     print branch
@@ -125,6 +124,9 @@ def save_top():
     db['top'] = os.popen('git rev-parse --show-toplevel').read().strip()
 
 
+def ppopen(cmd):
+    return Popen(cmd, shell=True, bufsize=1000, stdout=PIPE).stdout
+
 def scan_c(args):
     if args.e:
         e = [('(' if a == '[' else ')' if a == ']' else a) for a in args.e]
@@ -135,8 +137,9 @@ def scan_c(args):
 
     maxlines = 999999999 if args.all else 50
 
-    cmd = 'git grep --break -i --color --heading -p -n --full-name -C 2 ' + pat
-    out = os.popen(cmd).read()
+    cmd = 'git grep --break -i --color --heading -p -n --full-name -C 2 '.split() + [pat]
+
+    out = ppopen(cmd).read()
 
     ndx = 0
 
